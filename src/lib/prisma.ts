@@ -24,7 +24,10 @@ const buildDatabaseUrl = (): string => {
 
   let url = `postgres://${user}:${password}@${host}:${port}/${dbName}?sslmode=${sslMode}&connection_limit=${connectionLimit}`;
   if (caCert) {
-    url += `&sslrootcert=${caCert}`;
+    const resolvedCaCert = path.isAbsolute(caCert)
+      ? caCert
+      : path.resolve(process.cwd(), caCert);
+    url += `&sslrootcert=${resolvedCaCert}`;
   }
   return url;
 };
