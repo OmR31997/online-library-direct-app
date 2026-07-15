@@ -97,7 +97,7 @@ jobs:
             "$HOME/online-library-direct-app"
             "$HOME/online-library-pm2"
             "$HOME/online-library"
-            "/var/www/online-library-pm2"
+            "/var/online-library-direct-app"
           )
           
           REPO_DIR=""
