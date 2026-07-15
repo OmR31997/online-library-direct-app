@@ -30,7 +30,7 @@ export default function RootLayout({
         {/* Decorative Grid and Ambient Glows */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10" />
         <div className="absolute top-0 left-1/4 right-1/4 h-[250px] bg-blue-500/10 blur-[100px] -z-10" />
-        
+
         {/* Navigation Bar */}
         <header className="sticky top-0 z-50 border-b border-slate-900 bg-slate-950/70 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -40,7 +40,7 @@ export default function RootLayout({
                   OL
                 </div>
                 <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-                  online-library
+                  online-librar.in
                 </span>
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
@@ -55,7 +55,7 @@ export default function RootLayout({
                 </Link>
               </nav>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
