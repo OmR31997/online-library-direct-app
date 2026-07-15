@@ -40,7 +40,7 @@ export default function RootLayout({
                   OL
                 </div>
                 <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-                  online-library.com
+                  online-library.in
                 </span>
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
