@@ -1,0 +1,65 @@
+# This workflow is configured to deploy to an Amazon EC2 instance using PM2.
+# The Docker, ECR, and ECS steps are commented out as they are not used in this project.
+#
+# To use this workflow, you need to store the following GitHub Actions secrets:
+# 1. EC2_SSH_KEY - The private SSH key used to access your EC2 instance.
+# 2. EC2_HOST - The public IP or DNS host of your EC2 instance.
+# 3. EC2_USER - The username used to log in (e.g., ubuntu, ec2-user).
+name: Deploye AWS EC2
+on: 
+  push: 
+    branches: ["main"]
+
+  permissions:
+    contents: read
+
+  jobs:
+   name: Deploye to AWS EC2
+   runs-on: ubuntu-latest
+   steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to EC2 via PM2
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST}} '
+          # Define search paths for the repository
+
+          REPO_PATH=(
+          "online-library-direct-app"
+          "$HOME/online-library-direct-app"
+          )
+
+          REPO_DIR=""
+          for path in "${REPO_PATH[@]}"; do
+          # Resolve env vars like $HOME
+          resolved_path=$(eval echo "$path")
+          if [ -d "$resolved_path/.git" ]; then
+            REPO_DIR="$resolved_path"
+            break
+          fi
+          done
+
+          if [ -n "$REPO_DIR" ]; then
+            echo "Found repository at: $REPO_DIR"
+            cd "$REPO_DIR"
+            echo "Updating code..."
+            git fetch --all
+            git reset --hard origin/main
+            echo "Running deployment script..."
+            bash var/www/app/deploy.sh
+          else
+            echo "Repository not found on EC2. Setting up new deployment at $HOME/online-library-direct-app..."
+            mkdir -p "$HOME/online-library-direct-app"
+            git clone https://github.com/OmR31997/online-library-direct-app.git "$HOME/online-library-direct-app"
+            cd "$HOME/online-library-direct-app"
+            echo "Running deployment script..."
+            bash var/www/app/deploy.sh
+          fi
