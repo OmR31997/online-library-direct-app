@@ -90,25 +90,40 @@ jobs:
 
     - name: Deploy to EC2 via PM2
       run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-          if [ -f /var/www/app/var/www/app/deploy.sh ]; then
-            echo 'Running deploy.sh at /var/www/app/var/www/app/deploy.sh'
-            bash /var/www/app/var/www/app/deploy.sh
-          elif [ -f /var/www/app/deploy.sh ]; then
-            echo 'Running deploy.sh at /var/www/app/deploy.sh'
-            bash /var/www/app/deploy.sh
-          elif [ -f ~/online-library-pm2/var/www/app/deploy.sh ]; then
-            echo 'Running deploy.sh at ~/online-library-pm2/var/www/app/deploy.sh'
-            bash ~/online-library-pm2/var/www/app/deploy.sh
-          elif [ -f ~/var/www/app/deploy.sh ]; then
-            echo 'Running deploy.sh at ~/var/www/app/deploy.sh'
-            bash ~/var/www/app/deploy.sh
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
+          # Define search paths for the repository
+          SEARCH_PATHS=(
+            "/var/www/app"
+            "$HOME/online-library-direct-app"
+            "$HOME/online-library-pm2"
+            "$HOME/online-library"
+            "/var/www/online-library-pm2"
+          )
+          
+          REPO_DIR=""
+          for path in "${SEARCH_PATHS[@]}"; do
+            # Resolve env vars like $HOME
+            resolved_path=$(eval echo "$path")
+            if [ -d "$resolved_path/.git" ]; then
+              REPO_DIR="$resolved_path"
+              break
+            fi
+          done
+
+          if [ -n "$REPO_DIR" ]; then
+            echo "Found repository at: $REPO_DIR"
+            cd "$REPO_DIR"
+            echo "Updating code..."
+            git fetch --all
+            git reset --hard origin/main
+            echo "Running deployment script..."
+            bash var/www/app/deploy.sh
           else
-            echo 'Error: deploy.sh script not found on the EC2 server!'
-            echo 'Expected paths:'
-            echo '  - /var/www/app/var/www/app/deploy.sh'
-            echo '  - /var/www/app/deploy.sh'
-            echo '  - ~/online-library-pm2/var/www/app/deploy.sh'
-            exit 1
+            echo "Repository not found on EC2. Setting up new deployment at $HOME/online-library-direct-app..."
+            mkdir -p "$HOME/online-library-direct-app"
+            git clone https://github.com/OmR31997/online-library-direct-app.git "$HOME/online-library-direct-app"
+            cd "$HOME/online-library-direct-app"
+            echo "Running deployment script..."
+            bash var/www/app/deploy.sh
           fi
-        "
+        '
