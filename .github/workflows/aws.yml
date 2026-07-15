@@ -90,4 +90,25 @@ jobs:
 
     - name: Deploy to EC2 via PM2
       run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash /var/www/app/deploy.sh"
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          if [ -f /var/www/app/var/www/app/deploy.sh ]; then
+            echo 'Running deploy.sh at /var/www/app/var/www/app/deploy.sh'
+            bash /var/www/app/var/www/app/deploy.sh
+          elif [ -f /var/www/app/deploy.sh ]; then
+            echo 'Running deploy.sh at /var/www/app/deploy.sh'
+            bash /var/www/app/deploy.sh
+          elif [ -f ~/online-library-pm2/var/www/app/deploy.sh ]; then
+            echo 'Running deploy.sh at ~/online-library-pm2/var/www/app/deploy.sh'
+            bash ~/online-library-pm2/var/www/app/deploy.sh
+          elif [ -f ~/var/www/app/deploy.sh ]; then
+            echo 'Running deploy.sh at ~/var/www/app/deploy.sh'
+            bash ~/var/www/app/deploy.sh
+          else
+            echo 'Error: deploy.sh script not found on the EC2 server!'
+            echo 'Expected paths:'
+            echo '  - /var/www/app/var/www/app/deploy.sh'
+            echo '  - /var/www/app/deploy.sh'
+            echo '  - ~/online-library-pm2/var/www/app/deploy.sh'
+            exit 1
+          fi
+        "
