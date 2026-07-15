@@ -34,8 +34,7 @@ npm run build
 
 echo "Starting/Restarting the application under PM2..."
 # Delete the old process if it exists to avoid port/configuration conflicts, then start
-PORT=3000 pm2 restart 
-online-library-direct-app || PORT=3000 pm2 start npm --name "online-library-pm2" -- start
+PORT=3000 pm2 restart online-library-direct-app || PORT=3000 pm2 start npm --name "online-library-direct-app" -- start
 
 echo "Saving PM2 process list..."
 pm2 save
