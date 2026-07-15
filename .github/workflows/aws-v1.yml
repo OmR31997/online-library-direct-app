@@ -27,9 +27,39 @@ jobs:
       - name: Deploy to EC2 via PM2
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
-            cd ~/online-library-direct-app
-            git fetch --all
-            git reset --hard origin/dev
+
+            # meaning resolved_path = /home/ubuntu/online-library-direct-app
+            resolved_path=$(eval echo "$HOME/online-library-direct-app") 
+            REPO_DIR=""
+
+            if [ -d "resolved_path/.git" ]; then
+              REPO_DIR="resolved_path"
+            fi
+
+            if [ -n "$REPO_DIR" ]; then 
+              echo "Found repository at: $REPO_DIR"
+              cd "$REPO_DIR" 
+              
+              echo "Fetching latest changes..."
+              git fetch --all
+
+              echo "Resetting to latest..."
+              git reset --hard origin/dev
+
+              echo "Running deployment script..."
+              bash var/www/app/deploy.sh
+            else
+              echo "Repository not found on EC2. Setting up new deployment at $HOME/online-library-direct-app..."
+              mkdir -p "$HOME/online-library-direct-app"
+
+              git clone https://github.com/OmR31997/online-library-direct-app.git "$HOME/online-library-direct-app"
+              cd "$HOME/online-library-direct-app"
+              
+              echo "Running deployment script..."  
+              bash var/www/app/deploy.sh
+            fi
+            
+            echo "Running deployment script..."
             npm ci --legacy-peer-deps
             npx prisma generate
             npx prisma migrate deploy || echo "Migrations skipped"
