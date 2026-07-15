@@ -10,7 +10,7 @@ cd "$REPO_ROOT"
 
 echo "Fetching latest code from GitHub..."
 git fetch --all
-git reset --hard origin/main
+git reset --hard origin/dev
 
 # Load environment variables if .env file exists
 if [ -f .env ]; then

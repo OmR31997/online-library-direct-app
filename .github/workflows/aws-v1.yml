@@ -52,7 +52,7 @@ on:
             cd "$REPO_DIR"
             echo "Updating code..."
             git fetch --all
-            git reset --hard origin/main
+            git reset --hard origin/dev
             echo "Running deployment script..."
             bash var/www/app/deploy.sh
           else
