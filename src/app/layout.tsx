@@ -37,7 +37,7 @@ export default function RootLayout({
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2 group">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
-                  OL
+                  OL-OM
                 </div>
                 <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                   online-library.in**
