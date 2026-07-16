@@ -17,11 +17,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # - name: Setup SSH
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
       - name: Setup SSH
         run: |
+          set -x
+
           mkdir -p ~/.ssh
+
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+
           chmod 600 ~/.ssh/id_rsa
+
+          echo "Host=${{ secrets.EC2_HOST }}"
+          echo "User=${{ secrets.EC2_USER }}"
+
+          ls -la ~/.ssh
+          wc -c ~/.ssh/id_rsa
+
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2 via PM2
