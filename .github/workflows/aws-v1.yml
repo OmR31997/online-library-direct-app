@@ -32,8 +32,8 @@ jobs:
             resolved_path=$(eval echo "$HOME/online-library-direct-app") 
             REPO_DIR=""
 
-            if [ -d "resolved_path/.git" ]; then
-              REPO_DIR="resolved_path"
+            if [ -d "$resolved_path/.git" ]; then
+              REPO_DIR="$resolved_path"
             fi
 
             if [ -n "$REPO_DIR" ]; then 
@@ -49,16 +49,14 @@ jobs:
               echo "Running deployment script..."
               bash var/www/app/deploy.sh
             else
-              echo "Repository not found on EC2. Setting up new deployment at $HOME/online-library-direct-app..."
-              mkdir -p "$HOME/online-library-direct-app"
 
-              git clone https://github.com/OmR31997/online-library-direct-app.git "$HOME/online-library-direct-app"
-              cd "$HOME/online-library-direct-app"
+              git clone https://github.com/OmR31997/online-library-direct-app.git "$resolved_path"
+              cd "$resolved_path"
               
               echo "Running deployment script..."  
               bash var/www/app/deploy.sh
             fi
-            
+
             echo "Running deployment script..."
             npm ci --legacy-peer-deps
             npx prisma generate
