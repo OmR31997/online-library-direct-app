@@ -3,7 +3,7 @@ name: Deploy AWS EC2
 on:
   push:
     branches:
-      - dev   # trigger only when pushing to dev branch
+      - dev # trigger only when pushing to dev branch
 
 permissions:
   contents: read
@@ -28,8 +28,9 @@ jobs:
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
 
-            # meaning resolved_path = /home/ubuntu/online-library-direct-app
-            resolved_path=$(eval echo "$HOME/online-library-direct-app") 
+            # meaning resolved_path = /home/ubuntu/online-library-app
+            
+            resolved_path=$(eval echo "$HOME/online-library-app") 
             REPO_DIR=""
 
             if [ -d "$resolved_path/.git" ]; then
@@ -62,6 +63,6 @@ jobs:
             npx prisma generate
             npx prisma migrate deploy || echo "Migrations skipped"
             npm run build
-            PORT=3000 pm2 restart online-library-direct-app || PORT=3000 pm2 start npm --name "online-library-direct-app" -- start
+            PORT=3000 pm2 restart online-library-app || PORT=3000 pm2 start npm --name "online-library-app" -- start
             pm2 save
           '
