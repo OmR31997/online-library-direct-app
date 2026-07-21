@@ -28,7 +28,8 @@ jobs:
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
 
-            resolved_path="$HOME/online-library-app"
+            # meaning resolved_path = /home/ubuntu/online-library-direct-app
+            resolved_path=$(eval echo "$HOME/online-library-direct-app") 
             REPO_DIR=""
 
             if [ -d "$resolved_path/.git" ]; then
@@ -38,21 +39,29 @@ jobs:
             if [ -n "$REPO_DIR" ]; then 
               echo "Found repository at: $REPO_DIR"
               cd "$REPO_DIR" 
-
-              git remote set-url origin https://github.com/${{ github.repository }}.git
               
               echo "Fetching latest changes..."
-              git fetch origin dev
+              git fetch --all
 
               echo "Resetting to latest..."
               git reset --hard origin/dev
 
+              echo "Running deployment script..."
+              bash var/www/app/deploy.sh
             else
 
-              git clone https://github.com/${{ github.repository }}.git "$resolved_path"
+              git clone https://github.com/OmR31997/online-library-direct-app.git "$resolved_path"
               cd "$resolved_path"
+              
+              echo "Running deployment script..."  
+              bash var/www/app/deploy.sh
             fi
 
             echo "Running deployment script..."
-            bash var/www/app/deploy.sh
+            npm ci --legacy-peer-deps
+            npx prisma generate
+            npx prisma migrate deploy || echo "Migrations skipped"
+            npm run build
+            PORT=3000 pm2 restart online-library-direct-app || PORT=3000 pm2 start npm --name "online-library-direct-app" -- start
+            pm2 save
           '
