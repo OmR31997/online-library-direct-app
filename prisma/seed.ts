@@ -2768,6 +2768,266 @@ Hides complex implementation details, exposing only necessary interfaces.
   console.log("Web tutorials seeded.");
 
   // ==========================================
+  // DEVOPS & AUTOMATION TRACK SEEDING
+  // ==========================================
+  const devopsRoadmap = await prisma.roadmap.create({
+    data: {
+      title: "DevOps & Automation Track",
+      slug: "devops-automation",
+      description: "Learn to configure YAML environments, master Linux/Bash scripting basics, monitor processes, and automate AWS deployments with PM2, Nginx, and GitHub Actions.",
+      published: true,
+      nodes: [
+        { id: "devops-node-1", label: "YAML Syntax & Configuration", position: { x: 150, y: 50 } },
+        { id: "devops-node-2", label: "Shell Basics & Environment Setup", position: { x: 150, y: 150 } },
+        { id: "devops-node-3", label: "Scripting Fundamentals & Control", position: { x: 150, y: 250 } },
+        { id: "devops-node-4", label: "System Monitoring & Processes", position: { x: 150, y: 350 } },
+        { id: "devops-node-5", label: "Production Deploy Scripts (PM2/Nginx)", position: { x: 150, y: 450 } },
+        { id: "devops-node-6", label: "GitHub Actions CI/CD Pipelines", position: { x: 150, y: 550 } },
+      ],
+      edges: [
+        { id: "devops-edge-1-2", source: "devops-node-1", target: "devops-node-2" },
+        { id: "devops-edge-2-3", source: "devops-node-2", target: "devops-node-3" },
+        { id: "devops-edge-3-4", source: "devops-node-3", target: "devops-node-4" },
+        { id: "devops-edge-4-5", source: "devops-node-4", target: "devops-node-5" },
+        { id: "devops-edge-5-6", source: "devops-node-5", target: "devops-node-6" },
+      ],
+    },
+  });
+
+  const devopsChapters = [
+    {
+      title: "Chapter 1: YAML (YML) Configuration in DevOps",
+      slug: "chapter-1-yaml-configuration-devops",
+      description: "Master YAML file structures, syntax rules, scalar/collection types, and DevOps standards.",
+      content: `## YAML File Basics & Indentation Rules
+YAML (YAML Ain't Markup Language) is a human-friendly, key-value data serialization format. It is a strict superset of JSON, meaning any valid JSON file is also valid YAML. YAML is widely used for configuration in DevOps engines (Docker, Kubernetes, Ansible, CI/CD).
+YAML relies on whitespaces and indentation to define hierarchy instead of brackets or braces. Tabs are strictly forbidden and cause parsing errors. Standard practice is using 2 spaces per indentation level.
+
+---
+
+## Key-Value Mappings & Collections
+Data is represented in key-value pairs separated by a colon and a space (e.g., \`key: value\`). Without the trailing space, it will fail parsing.
+Lists or collections are defined using a hyphen (\`-\`) followed by a space under a key.
+Nested objects are created by increasing the indentation level.
+
+---
+
+## Strings and Multiline Blocks
+Plain strings do not require quotation marks unless they contain special characters (like braces, colons, or brackets).
+Multiline strings can be formatted in two ways:
+1. **Literal Block (\`|\`)**: Preserves all line breaks and trailing newlines exactly. Used for SSH keys, script payloads, and configuration files.
+2. **Folded Block (\`>\`)**: Replaces newlines with spaces, folding the text into a single continuous paragraph.
+
+---
+
+## Advanced YAML Features & Best Practices
+1. **Multi-Document Files**: Separated by three hyphens (\`---\`). Allows defining multiple configurations (like Kubernetes pods and services) in a single file.
+2. **Anchors (\`&Link\`) and Aliases (\`*Link\`)**: Used to reference and duplicate blocks of code without retyping.
+3. **Merge Keys (\`<<\`)**: Inherits fields from anchored objects to extend configurations.
+4. **Validation**: Use tools like \`yamllint\` or IDE extensions to catch indentation errors before execution.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+    {
+      title: "Chapter 2: Introduction to Shell & Environment Setup (DAY_01)",
+      slug: "chapter-2-introduction-shell-environment-setup",
+      description: "Understand the Linux OS layers, system monitoring commands, vim editors, permissions, and SSH connections.",
+      content: `## The Linux Architecture Layers
+To automate Linux systems, you must understand the relationship between Applications, Shells, and the Kernel:
+1. **Kernel**: The core engine of Linux (written in C). It manages system hardware, CPU, memory, networking, and files. Developed by Linus Torvalds in 1991.
+2. **Shell**: The CLI interpreter that takes user commands and requests the Kernel to execute them.
+3. **Applications (Utilities)**: Command-line utilities (like ls, cd, git) that run on top of the shell.
+Popular shells include Bourne Shell (\`sh\`), Bourne Again Shell (\`bash\`), Korn Shell (\`ksh\`), C Shell (\`csh\`), and Friendly Interactive Shell (\`fish\`).
+
+---
+
+## System Diagnostics and Commands
+* \`echo\`: Prints text to standard output.
+* \`mkdir -p\`: Creates directories; \`-p\` creates parents if missing and prevents errors if already existing.
+* \`free -h\`: Displays total, used, and free RAM in human-readable (MB/GB) format.
+* \`cat /proc/meminfo\`: Displays detailed memory statistics from the kernel.
+* \`vmstat -s\`: Shows a summary of system processes, memory, and CPU activity.
+* \`df -h\`: Shows disk usage, mounts, and free space across storage devices.
+* \`rm -rf\`: Recursively and forcefully deletes directories/files (caution: irreversible).
+* \`touch\`: Creates a new empty file or updates access times.
+* \`mv\`: Moves or renames files and directories.
+* \`ls -l\`: Lists files in long format showing permissions, owner, size, and modifications.
+* \`which\`: Pinpoints the executable binary path of any system command.
+* \`wc -c\`: Counts bytes in a file, useful to verify SSH key files.
+
+---
+
+## Text Editing & Permissions
+* **Vim Editor**: Run \`vim filename\` to edit. Press \`i\` to enter Insert Mode. Press \`Esc\` followed by \`:wq\` to write and quit, or \`:qa\` to quit without saving.
+* **File Permissions**: Control access for Owner (User), Group, and Others.
+  * Numerical: Read (4), Write (2), Execute (1). Example: \`755\` (rwxr-xr-x), \`644\` (rw-r--r--).
+  * Symbolic: \`chmod u+x\` (add execute to user), \`chmod g-w\` (remove write from group).
+* **Shebang (\`#!/bin/bash\`)**: The first line of a script indicating which interpreter should run it.
+
+---
+
+## Shell Environment & Redirection Gaps
+1. **Environment Variables**: Declared with \`export VAR=\"value\"\`, making them accessible to child processes. Shell variables are local to the script unless exported.
+2. **Redirection Operators**:
+   * \`>\` overwrites file contents with stdout.
+   * \`>>\` appends stdout to the file.
+   * \`2>\` redirects stderr.
+   * \`&>\` redirects both stdout and stderr.
+3. **Piping (\`|\`)**: Channels the stdout of one command as the stdin of the next (e.g., \`ps aux | grep node\`).
+
+---
+
+## Connecting to AWS EC2 via SSH
+Connecting to remote servers requires SSH keys and security configurations:
+1. Generate keys locally, and create an EC2 instance.
+2. Set private key permission to read-only for owner using \`chmod 600 key.pem\`. SSH will reject keys with open permissions.
+3. Register host fingerprints via \`ssh-keyscan -H IP >> ~/.ssh/known_hosts\` to prevent interactive prompt confirmation.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+    {
+      title: "Chapter 3: Scripting Fundamentals & Logic Control (DAY_02)",
+      slug: "chapter-3-scripting-fundamentals-logic-control",
+      description: "Learn comments, user inputs, positional arguments, conditional execution, loops, and functions in Bash.",
+      content: `## Comments and Variables
+Bash comments document your script. Single-line comments start with \`#\`. Multi-line comments can be declared using here-documents \`<< comment\` or null commands \`: '...'\`.
+Variables hold values without spaces around the equals sign (e.g., \`name=\"Sameer\"\`).
+Access variables with a prefix \`$\` (e.g., \`$name\`).
+Read user input interactively using the \`read\` command. Use \`read -p \"Prompt\"\` for messages, and \`read -s\` to hide secret inputs (like passwords).
+
+---
+
+## Positional Parameters & Script Arguments
+Arguments passed to a script are captured automatically:
+* \`$0\`: The name of the script.
+* \`$1\`, \`$2\`: The first and second arguments.
+* \`$#\`: Total count of arguments.
+* \`$@\`: Array of all arguments.
+
+---
+
+## Conditionals and Loops
+Conditional execution uses \`if [ condition ]; then ... else ... fi\`. Common operators include \`-ge\` (greater-equal), \`-le\` (less-equal), \`-eq\` (equal), and \`-n\` (length > 0).
+* **For Loop**: Iterates over ranges or variables. (e.g., \`for ((i=0; i<5; i++)); do ... done\`).
+* **While Loop**: Runs while a condition evaluates to true.
+* **Until Loop**: Runs until a condition evaluates to true.
+Use double brackets \`[[ ... ]]\` for advanced features like pattern matching and logical operators (\`&&\`, \`||\`, \`!\`).
+
+---
+
+## Functions and Scope
+Functions group command sequences:
+* Define as \`function_name() { ... }\`.
+* Call by using the function name alone (arguments passed inside).
+* Declare local variables with \`local var\` to prevent global scope pollution.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+    {
+      title: "Chapter 4: Advanced Scripting & System Monitoring (DAY_03)",
+      slug: "chapter-4-advanced-scripting-system-monitoring",
+      description: "Implement exit codes, robust error handling, process signals, background jobs, and automated cron schedules.",
+      content: `## Error Handling & Exit Status
+Every Linux command returns an exit status (exit code) stored in \`$?\` upon completion:
+* \`0\`: Success.
+* Non-zero (1-255): Error code.
+To build robust scripts, check exit codes using \`if ! command; then exit 1; fi\`.
+Use \`set -e\` at the top of scripts to exit immediately if any command returns a non-zero code.
+Use \`trap 'commands' EXIT\` to execute cleanup instructions (like removing temp files) on exit.
+
+---
+
+## Process Management & Signals
+Linux runs tasks in the foreground or background:
+* **Backgrounding**: Append \`&\` to run a process in the background.
+* **Job Control**: List background tasks using \`jobs\`. Resume jobs in background (\`bg\`) or foreground (\`fg\`).
+* **Process Info**: Monitor processes via \`top\`, \`htop\`, or list them with \`ps aux\`.
+* **Signals**: Send control signals using \`kill\`:
+  * \`kill -15 (SIGTERM)\`: Polite request to terminate (allows cleanup).
+  * \`kill -9 (SIGKILL)\`: Force termination immediately.
+
+---
+
+## Scheduling and Maintenance
+1. **Cron Jobs**: Automate task execution. Edit using \`crontab -e\`.
+   * Format: \`* * * * * command\` (Minute, Hour, Day of Month, Month, Day of Week).
+2. **File Logging**: Standardize script outputs by writing logs with dates (\`date '+%Y-%m-%d'\`).
+3. **Temp Directory**: Use \`mktemp -d\` to create secure temporary workspaces.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+    {
+      title: "Chapter 5: Breakdown of the Interactive Deployment Script",
+      slug: "chapter-5-breakdown-interactive-deployment-script",
+      description: "Deconstruct a production-grade Bash deployment script configuring PM2, Prisma, Nginx, and Swap space.",
+      content: `## Setup and Preparation Phases
+Let's dissect the components of a production-grade deployment script:
+1. **Cleanup (\`cleanup_space\`)**: Deletes old Docker images, Next.js caches, and system journal logs to prevent disk full (ENOSPC) errors on small virtual machines.
+2. **Swap Configuration (\`setup_swap\`)**: Allocates 2GB swap space to prevent Out-Of-Memory (OOM) errors during memory-heavy compiles (like Next.js build).
+3. **Repository Management (\`code_clone\`)**: Checks if the target folder exists. If yes, runs git pull; otherwise, clones the repository.
+
+---
+
+## Dependency and Config Injection
+4. **Interactive Prompts (\`prompt_yes_no\` & \`read_multiline_content\`)**: Interactively prompts for custom settings. Reads multiline environmental configs and SSL credentials until typing \`EOF\`.
+5. **Node & PM2 Installation**: Installs curl and Nginx, checks the local Node.js version, installs/upgrades to Node 22, and installs PM2 globally.
+6. **Prisma Schema Build**: Installs dependencies (\`npm ci --legacy-peer-deps\`), compiles the database client (\`npx prisma generate\`), and applies migrations (\`npx prisma migrate deploy\`).
+
+---
+
+## Server Start and Nginx Reverse Proxy
+7. **PM2 Startup (\`deploy\`)**: Sinks environment variables, cleans up previous PM2 processes, starts Next.js under PM2 with specified ports (\`PORT=8000 pm2 start npm --name ... -- start\`), and runs \`pm2 save\`.
+8. **Nginx Automation (\`configure_nginx\`)**: Sets up Nginx site configurations, forwards headers for web sockets (\`Upgrade\`, \`Connection\`), passes requests to the PM2 port, and restarts the service.
+9. **SSL Certification (\`configure_ssl\`)**: Checks for domains, installs Certbot, and requests Let's Encrypt certificates non-interactively.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+    {
+      title: "Chapter 6: Automated GitHub Actions CI/CD Pipeline",
+      slug: "chapter-6-automated-github-actions-cicd-pipeline",
+      description: "Understand workflow files, SSH runner keys, EC2 deployments, and pipeline optimization.",
+      content: `## Workflow Structure & Triggers
+GitHub Actions uses YAML configurations to trigger automation pipelines:
+* \`name\`: The name shown in the GitHub Actions dashboard.
+* \`on\`: Triggers the pipeline. Example: push events targeting the \`dev\` branch.
+* \`runs-on\`: The OS runner environment. \`ubuntu-latest\` allocates a temporary VM to compile and deploy.
+* \`permissions\`: Defines standard security access levels (e.g., \`contents: read\` to download files).
+
+---
+
+## Runner SSH Authentication
+To deploy to AWS EC2, the runner must authenticate remotely:
+1. **Checkout**: \`actions/checkout@v4\` downloads repository code onto the runner.
+2. **Setup SSH**:
+   * Creates a private folder (\`mkdir -p ~/.ssh\`).
+   * Writes the secret private key from GitHub Secrets to \`~/.ssh/id_rsa\`.
+   * Restricts key permissions to \`600\` (read-write for user only).
+   * Uses \`ssh-keyscan\` to register the EC2 host key, bypassing host prompt verification.
+
+---
+
+## Code Sync & Redundancy Pitfalls
+Once connected, the runner runs commands on the EC2 server using \`ssh user@host 'commands'\`.
+1. **Path Resolution**: Evaluates \`$HOME\` dynamically (\`resolved_path=\$(eval echo \"\$HOME/...\")\`).
+2. **Branch Check & Sync**: Clones if missing, fetches and resets files hard (\`git reset --hard origin/dev\`) to match dev.
+3. **Execution Redundancy**: In the provided workflow, the runner executes the deployment script \`bash var/www/app/deploy.sh\`, which performs dependencies installation, Prisma generation, database migrations, Next.js building, and PM2 setup. However, immediately after, the workflow script executes the exact same steps in the inline shell commands (\`npm ci\`, \`prisma generate\`, \`prisma migrate\`, \`npm run build\`, PM2 restart).
+4. **Optimization Best Practices**:
+   * Eliminate this duplication. Only call the script or the inline commands, not both.
+   * Shift heavy tasks: Build the production bundle on the GitHub runner first, then copy the built files to the EC2 server. This prevents server downtime and high memory usage on small EC2 instances.`,
+      published: true,
+      roadmapId: devopsRoadmap.id,
+    },
+  ];
+
+  for (const ch of devopsChapters) {
+    await prisma.tutorial.create({
+      data: ch,
+    });
+  }
+
+  console.log("DevOps tutorials seeded.");
+
+  // ==========================================
   // QUIZZES AND QUESTIONS SEEDING
   // ==========================================
 
@@ -2893,6 +3153,54 @@ Hides complex implementation details, exposing only necessary interfaces.
         options: ["class Child implements Parent", "class Child extends Parent", "class Child inherits Parent", "class Child prototype Parent"],
         correctAnswerIndex: 1,
         quizId: webQuiz.id,
+      }
+    ],
+  });
+
+  // 4. DevOps Quiz
+  const devopsQuiz = await prisma.quiz.create({
+    data: {
+      title: "DevOps & Automation Track Assessment",
+      description: "Test your skills on YAML configurations, Linux CLI utilities, shell scripts, and GitHub Actions pipelines.",
+    },
+  });
+
+  await prisma.question.createMany({
+    data: [
+      {
+        text: "In YAML, which block scalar indicator preserves all line breaks and trailing newlines exactly?",
+        options: ["|", ">", "||", "&&"],
+        correctAnswerIndex: 0,
+        quizId: devopsQuiz.id,
+      },
+      {
+        text: "Which command option is used to create parent directories if they are missing when making a new folder?",
+        options: ["mkdir -r", "mkdir -p", "mkdir -f", "mkdir -d"],
+        correctAnswerIndex: 1,
+        quizId: devopsQuiz.id,
+      },
+      {
+        text: "What file permission setting is required by SSH for private keys (e.g., id_rsa) before establishing a connection?",
+        options: ["chmod 777", "chmod 644", "chmod 600", "chmod 755"],
+        correctAnswerIndex: 2,
+        quizId: devopsQuiz.id,
+      },
+      {
+        text: "Which special variable in Bash stores the exit status of the last executed command?",
+        options: ["$#", "$@", "$?", "$!"],
+        correctAnswerIndex: 2,
+        quizId: devopsQuiz.id,
+      },
+      {
+        text: "In the provided deployment workflow, why is running 'npm run build' directly on a small AWS EC2 instance sometimes problematic?",
+        options: [
+          "It can cause Out-Of-Memory (OOM) failures due to high compilation resource requirements.",
+          "Next.js builds are not supported on Linux systems.",
+          "PM2 cannot start applications if they are built on the server.",
+          "It modifies the local git repository state."
+        ],
+        correctAnswerIndex: 0,
+        quizId: devopsQuiz.id,
       }
     ],
   });

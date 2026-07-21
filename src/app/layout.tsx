@@ -16,7 +16,8 @@ const firaCode = Fira_Code({
 
 export const metadata: Metadata = {
   title: "Online Library | Interactive Learning & Roadmaps",
-  description: "Accelerate your learning path with structured roadmaps, interactive quizzes, and step-by-step tutorials.",
+  description:
+    "Accelerate your learning path with structured roadmaps, interactive quizzes, and step-by-step tutorials.",
 };
 
 export default function RootLayout({
@@ -25,7 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${firaCode.variable} h-full antialiased dark`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${firaCode.variable} h-full antialiased dark`}
+    >
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-blue-600/30 selection:text-blue-200">
         {/* Decorative Grid and Ambient Glows */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10" />
@@ -40,17 +44,26 @@ export default function RootLayout({
                   OL
                 </div>
                 <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-                  online-library.in**
+                  online-library.in
                 </span>
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
-                <Link href="/roadmap" className="hover:text-slate-100 transition-colors">
+                <Link
+                  href="/roadmap"
+                  className="hover:text-slate-100 transition-colors"
+                >
                   Roadmaps
                 </Link>
-                <Link href="/tutorials" className="hover:text-slate-100 transition-colors">
+                <Link
+                  href="/tutorials"
+                  className="hover:text-slate-100 transition-colors"
+                >
                   Tutorials
                 </Link>
-                <Link href="/quiz" className="hover:text-slate-100 transition-colors">
+                <Link
+                  href="/quiz"
+                  className="hover:text-slate-100 transition-colors"
+                >
                   Quizzes
                 </Link>
               </nav>
@@ -80,16 +93,26 @@ export default function RootLayout({
         <footer className="border-t border-slate-900 bg-slate-950 py-10 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-sm text-slate-500">
-              &copy; {new Date().getFullYear()} online-library. All rights reserved.
+              &copy; {new Date().getFullYear()} online-library. All rights
+              reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/privacy" className="hover:text-slate-200 transition-colors">
+              <Link
+                href="/privacy"
+                className="hover:text-slate-200 transition-colors"
+              >
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="hover:text-slate-200 transition-colors">
+              <Link
+                href="/terms"
+                className="hover:text-slate-200 transition-colors"
+              >
                 Terms of Service
               </Link>
-              <Link href="/docs/api" className="hover:text-slate-200 transition-colors">
+              <Link
+                href="/docs/api"
+                className="hover:text-slate-200 transition-colors"
+              >
                 API Docs
               </Link>
             </div>
@@ -97,7 +120,17 @@ export default function RootLayout({
         </footer>
 
         {/* Toast Notification Provider */}
-        <Toaster position="top-right" theme="dark" toastOptions={{ style: { background: "#0b0f19", borderColor: "#1e293b", color: "#f1f5f9" } }} />
+        <Toaster
+          position="top-right"
+          theme="dark"
+          toastOptions={{
+            style: {
+              background: "#0b0f19",
+              borderColor: "#1e293b",
+              color: "#f1f5f9",
+            },
+          }}
+        />
       </body>
     </html>
   );
