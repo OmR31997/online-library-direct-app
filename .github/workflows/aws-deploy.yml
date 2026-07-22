@@ -41,8 +41,8 @@ jobs:
       # - name: Run Tests
       #   run: npm test
 
-      - name: Build Application
-        run: npm run build
+      # - name: Build Application
+      #   run: npm run build
 
       # - name: Upload Build Artifact
       #   uses: actions/upload-artifact@v4
