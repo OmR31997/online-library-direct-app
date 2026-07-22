@@ -6,6 +6,20 @@ APP_NAME="${APP_NAME:?APP_NAME is required}"
 APP_DIR="${APP_DIR:?APP_DIR is required}"
 BRANCH_NAME="${BRANCH_NAME:?BRANCH_NAME is required}"
 
+cleanup_space() {
+    echo "Cleaning up build and cache artifacts to avoid ENOSPC..."
+
+    rm -rf .next || true
+
+    if command -v npm >/dev/null 2>&1; then
+        npm cache clean --force || true
+    fi
+
+    if command -v pm2 >/dev/null 2>&1; then
+        pm2 flush || true
+    fi
+}
+
 echo "======================================"
 echo "Deploying $APP_NAME"
 echo "Branch: $BRANCH_NAME"
@@ -24,8 +38,10 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
+cleanup_space
+
 echo "Installing dependencies..."
-npm ci --legacy-peer-deps
+npm ci --legacy-peer-deps --no-audit --no-fund
 
 echo "Building application..."
 npm run build 
