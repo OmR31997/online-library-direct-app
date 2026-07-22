@@ -25,7 +25,7 @@ if [ ! -f ".env" ]; then
 fi
 
 echo "Installing dependencies..."
-npm ci
+npm ci --legacy-peer-deps
 
 echo "Building application..."
 npm run build 
