@@ -84,6 +84,6 @@ jobs:
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
           export APP_NAME='${{ secrets.APP_NAME }}' 
-          export APP_DIR='\$HOME/${{ secrets.APP_NAME }}' 
-          export BRANCH_NAME='${{ github.ref_name }}' 
+          export APP_DIR=\$HOME/${{ secrets.APP_NAME }} 
+          export BRANCH_NAME=${{ github.ref_name }} 
           bash \$APP_DIR/scripts/deploy.sh"
