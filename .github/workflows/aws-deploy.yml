@@ -86,5 +86,5 @@ jobs:
           export APP_NAME="${{ secrets.APP_NAME }}" 
           export APP_DIR="\$HOME/${{ secrets.APP_NAME }}" 
           export BRANCH_NAME="${{ github.ref_name }}" 
-          bash "\$APP_DIR/deploy.sh"
+          bash "\$APP_DIR/scripts/deploy.sh"
           EOF
