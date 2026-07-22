@@ -9,25 +9,9 @@ BRANCH_NAME="${BRANCH_NAME:?BRANCH_NAME is required}"
 cleanup_space() {
     echo "Cleaning up build and cache artifacts to avoid ENOSPC..."
 
-    rm -rf node_modules || true
-    rm -rf .next || true
-    rm -rf .turbo || true
-    rm -rf .cache || true
-    rm -rf "$HOME/.npm/_cacache" || true
-    rm -rf "$HOME/.npm/_logs" || true
-
-    if command -v docker >/dev/null 2>&1; then
-        docker system prune -af || true
-        docker builder prune -af || true
-    fi
-
-    if command -v journalctl >/dev/null 2>&1; then
-        sudo journalctl --vacuum-size=50M || true
-    fi
-
-    if command -v apt-get >/dev/null 2>&1; then
-        sudo apt-get clean || true
-    fi
+    # Remove Next.js build output and transient caches from previous runs.
+    rm -rf .next .turbo .cache .next/cache node_modules/.cache || true
+    rm -f npm-debug.log yarn-error.log pnpm-debug.log || true
 
     if command -v npm >/dev/null 2>&1; then
         npm cache clean --force || true
@@ -36,19 +20,9 @@ cleanup_space() {
     if command -v pm2 >/dev/null 2>&1; then
         pm2 flush || true
     fi
-}
 
-rollback_to_previous_commit() {
-    local exit_code="$1"
-
-    trap - ERR
-    echo "Deployment failed. Rolling back local checkout..."
-    if [ -n "${PREVIOUS_COMMIT:-}" ]; then
-        git checkout -q "$PREVIOUS_COMMIT" || true
-        echo "Rolled back to $PREVIOUS_COMMIT"
-    fi
-
-    exit "$exit_code"
+    # Trim any stray temporary files in the app directory.
+    find . -maxdepth 1 -type f \( -name "*.log" -o -name "*.tmp" -o -name "*.temp" \) -delete 2>/dev/null || true
 }
 
 echo "======================================"
@@ -59,40 +33,17 @@ echo "======================================"
 
 cd "$APP_DIR"
 
+echo "Fetching latest code..."
+git fetch origin
+git checkout "$BRANCH_NAME"
+git pull --ff-only origin "$BRANCH_NAME"
+
 if [ ! -f ".env" ]; then
     echo ".env file not found. Please create it before deploying."
     exit 1
 fi
 
-PREVIOUS_COMMIT="$(git rev-parse HEAD)"
-REMOTE_COMMIT="$(git ls-remote origin "refs/heads/$BRANCH_NAME" | awk 'NR==1 { print $1 }')"
-
-if [ -z "$REMOTE_COMMIT" ]; then
-    echo "Unable to resolve remote commit for branch '$BRANCH_NAME'."
-    exit 1
-fi
-
-if [ "$PREVIOUS_COMMIT" = "$REMOTE_COMMIT" ]; then
-    echo "No new commit found on origin/$BRANCH_NAME."
-    echo "Current commit is already up to date: $PREVIOUS_COMMIT"
-    exit 0
-fi
-
-echo "New commit detected:"
-echo "Current: $PREVIOUS_COMMIT"
-echo "Remote : $REMOTE_COMMIT"
-
-trap 'rollback_to_previous_commit $?' ERR
-
 cleanup_space
-
-if command -v df >/dev/null 2>&1; then
-    df -h "$APP_DIR" || true
-fi
-
-echo "Fetching latest code..."
-git -c gc.auto=0 fetch --prune --depth=1 origin "$BRANCH_NAME"
-git checkout -q "$REMOTE_COMMIT"
 
 echo "Installing dependencies..."
 npm ci --legacy-peer-deps --no-audit --no-fund
@@ -109,8 +60,6 @@ else
 fi
 
 pm2 save
-
-trap - ERR
 
 echo "======================================"
 echo "Deployment completed successfully!"
