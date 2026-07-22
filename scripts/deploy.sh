@@ -9,7 +9,12 @@ BRANCH_NAME="${BRANCH_NAME:?BRANCH_NAME is required}"
 cleanup_space() {
     echo "Cleaning up build and cache artifacts to avoid ENOSPC..."
 
+    rm -rf node_modules || true
     rm -rf .next || true
+    rm -rf .turbo || true
+    rm -rf .cache || true
+    rm -rf "$HOME/.npm/_cacache" || true
+    rm -rf "$HOME/.npm/_logs" || true
 
     if command -v npm >/dev/null 2>&1; then
         npm cache clean --force || true
@@ -28,17 +33,17 @@ echo "======================================"
 
 cd "$APP_DIR"
 
-echo "Fetching latest code..."
-git fetch origin
-git checkout "$BRANCH_NAME"
-git pull --ff-only origin "$BRANCH_NAME"
-
 if [ ! -f ".env" ]; then
     echo ".env file not found. Please create it before deploying."
     exit 1
 fi
 
 cleanup_space
+
+echo "Fetching latest code..."
+git fetch origin
+git checkout "$BRANCH_NAME"
+git pull --ff-only origin "$BRANCH_NAME"
 
 echo "Installing dependencies..."
 npm ci --legacy-peer-deps --no-audit --no-fund
