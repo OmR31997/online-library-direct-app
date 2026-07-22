@@ -1,1 +1,86 @@
-name: Deploy AWS EC2
+name: CI/CD - Deploy AWS EC2
+
+on:
+  push:
+    branches:
+      - stage
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22
+
+jobs:
+  ########################
+  # CI/CD Workflow
+  ########################
+  ci:
+    name: Continuous Integration (Verify)
+    runs-on: ubuntu-latest # Initiate a virtual machine with Ubuntu OS
+
+    steps:
+      - name: Checkout Repository/Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      # - name: Lint
+      #   run: npm run lint
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build Application
+        run: npm run build
+
+      # - name: Upload Build Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: application-build
+      #     path: |
+      #       .
+      #       !node_modules
+      #       !.git
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+  #################################################
+  # CD (Continuous Deployment)
+  #################################################
+  cd:
+    name: Continuous Deployment (Deploy)
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Download Build Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: application-build
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash $HOME/var/www/deploy/deploy.sh"
