@@ -19,10 +19,26 @@ cleanup_space() {
 
     if command -v pm2 >/dev/null 2>&1; then
         pm2 flush || true
+        rm -rf "$HOME/.pm2/logs"/* 2>/dev/null || true
     fi
+
+    # Trim common user-level caches that can block git fetch.
+    rm -rf "$HOME/.cache"/* "$HOME/.cache/npm" "$HOME/.npm/_cacache" 2>/dev/null || true
 
     # Trim any stray temporary files in the app directory.
     find . -maxdepth 1 -type f \( -name "*.log" -o -name "*.tmp" -o -name "*.temp" \) -delete 2>/dev/null || true
+}
+
+fetch_latest_code() {
+    echo "Fetching latest code..."
+
+    if git fetch origin; then
+        return 0
+    fi
+
+    echo "git fetch failed, trying cleanup and one retry..."
+    cleanup_space
+    git fetch origin
 }
 
 echo "======================================"
@@ -33,8 +49,9 @@ echo "======================================"
 
 cd "$APP_DIR"
 
-echo "Fetching latest code..."
-git fetch origin
+cleanup_space
+
+fetch_latest_code
 git checkout "$BRANCH_NAME"
 git pull --ff-only origin "$BRANCH_NAME"
 
@@ -42,8 +59,6 @@ if [ ! -f ".env" ]; then
     echo ".env file not found. Please create it before deploying."
     exit 1
 fi
-
-cleanup_space
 
 echo "Installing dependencies..."
 npm ci --legacy-peer-deps --no-audit --no-fund
