@@ -11,9 +11,9 @@ env:
   NODE_VERSION: 22
 
 jobs:
-  ########################
-  # CI/CD Workflow
-  ########################
+  #################################################
+  # CI (Continuous Integration)
+  #################################################
   ci:
     name: Continuous Integration (Inspection)
     runs-on: ubuntu-latest # Initiate a virtual machine with Ubuntu OS

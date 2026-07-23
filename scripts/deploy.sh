@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# -e: This prevents deploying a broken application (Script stops immediately).
+# -u: Treat undefined variables as errors.
+# -o: pipefail: This ensures that the script fails if any command in a pipeline fails.
+
 set -euo pipefail
 
+# Ensure required environment variables are set.
 APP_NAME="${APP_NAME:?APP_NAME is required}"
 APP_DIR="${APP_DIR:?APP_DIR is required}"
 BRANCH_NAME="${BRANCH_NAME:?BRANCH_NAME is required}"
+
 
 cleanup_space() {
     echo "Cleaning up build and cache artifacts to avoid ENOSPC..."
